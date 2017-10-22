@@ -1,6 +1,7 @@
 from threading import Thread
 from slackclient import SlackClient
 from . import handlers
+from signal import signal
 import sys
 import os
 
@@ -8,6 +9,9 @@ import os
 class Qasimodo(object):
     
     def __init__(self, token):
+        signal(signal.SIGINT, self.close)
+        signal(signal.SIGTERM, self.close)
+
         self.event_handler = HandlerThread(token)
 
     def start(self):
