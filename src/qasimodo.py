@@ -1,7 +1,7 @@
 from threading import Thread
 from slackclient import SlackClient
-from . import handlers
-from signal import signal
+import handlers
+import signal
 import sys
 import os
 
@@ -9,15 +9,17 @@ import os
 class Qasimodo(object):
     
     def __init__(self, token):
-        signal(signal.SIGINT, self.close)
-        signal(signal.SIGTERM, self.close)
-
         self.event_handler = HandlerThread(token)
+        
+        signal.signal(signal.SIGINT, self.stop)
+        signal.signal(signal.SIGTERM, self.stop)
 
     def start(self):
         self.event_handler.start()
-        self.event_handler.join()
+        #self.event_handler.join()
 
+    def stop(self):
+        self.event_handler.stop()
 
 class HandlerThread(Thread):
 
@@ -28,12 +30,17 @@ class HandlerThread(Thread):
         self.__token = token
 
     def run(self):
-        with SlackClient(self.__token) as sc:
+        try:
+            sc = SlackClient(self.__token)
             if sc.rtm_connect():
                 while self.__continue:
                     events = sc.rtm_read()
                     for e in events:
                         self.__emitter.emit(e['type'], (e, sc))
+            else:
+                raise Exception("cannot connect")
+        except Exception as ex:
+            print(ex)
 
     def stop(self):
         self.__continue = False
@@ -48,4 +55,6 @@ if __name__ == '__main__':
         raise Exception('No token found for the bot')
 
     qasimodo = Qasimodo(token)
+    qasimodo.start()
+    qasimodo.event_handler.join()
 
