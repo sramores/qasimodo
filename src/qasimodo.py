@@ -1,6 +1,6 @@
 from threading import Thread
 from slackclient import SlackClient
-from handlers import greeting
+from handlers import greeting, response
 import handlers
 import signal
 import sys
