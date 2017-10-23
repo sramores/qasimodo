@@ -1,5 +1,6 @@
 from threading import Thread
 from slackclient import SlackClient
+from handlers import greeting
 import handlers
 import signal
 import sys
@@ -11,8 +12,8 @@ class Qasimodo(object):
     def __init__(self, token):
         self.event_handler = HandlerThread(token)
         
-        signal.signal(signal.SIGINT, self.stop)
-        signal.signal(signal.SIGTERM, self.stop)
+        signal.signal(signal.SIGINT, self.__stop)
+        signal.signal(signal.SIGTERM, self.__stop)
 
     def start(self):
         self.event_handler.start()
@@ -20,6 +21,9 @@ class Qasimodo(object):
 
     def stop(self):
         self.event_handler.stop()
+
+    def __stop(self, *args, **kargs):
+        self.stop()
 
 class HandlerThread(Thread):
 
@@ -36,7 +40,8 @@ class HandlerThread(Thread):
                 while self.__continue:
                     events = sc.rtm_read()
                     for e in events:
-                        self.__emitter.emit(e['type'], (e, sc))
+                        print(e)
+                        self.__emitter.emit(e['type'], e, sc)
             else:
                 raise Exception("cannot connect")
         except Exception as ex:
