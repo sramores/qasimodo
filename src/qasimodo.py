@@ -41,11 +41,12 @@ class HandlerThread(Thread):
                     events = sc.rtm_read()
                     for e in events:
                         print(e)
-                        self.__emitter.emit(e['type'], e, sc)
+                        if 'type' in e:
+                            self.__emitter.emit(e['type'], e, sc)
             else:
                 raise Exception("cannot connect")
         except Exception as ex:
-            print(ex)
+            print("Exception: "+str(ex))
 
     def stop(self):
         self.__continue = False
