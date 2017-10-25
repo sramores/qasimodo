@@ -1,4 +1,4 @@
 slackclient==1.0.9
 pymitter==0.2.3
-
+git+git://github.com/josiahcarlson/parse-crontab.git
 
