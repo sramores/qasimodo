@@ -1,5 +1,6 @@
 from threading import Thread
 from slackclient import SlackClient
+from sched import scheduler
 from handlers import greeting, response
 import handlers
 import signal
@@ -10,13 +11,14 @@ import os
 class Qasimodo(object):
     
     def __init__(self, token):
-        self.event_handler = HandlerThread(token)
-        
+        #self.event_handler = HandlerThread(token)
+        self.scheduler = scheduler
         signal.signal(signal.SIGINT, self.__stop)
         signal.signal(signal.SIGTERM, self.__stop)
 
     def start(self):
-        self.event_handler.start()
+        self.scheduler.start()
+        #self.event_handler.start()
         #self.event_handler.join()
 
     def stop(self):
@@ -62,5 +64,6 @@ if __name__ == '__main__':
 
     qasimodo = Qasimodo(token)
     qasimodo.start()
-    qasimodo.event_handler.join()
+    #qasimodo.event_handler.join()
+    input()
 
