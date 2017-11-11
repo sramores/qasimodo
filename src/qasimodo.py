@@ -2,7 +2,7 @@ from threading import Thread
 from slackclient import SlackClient
 from sched import scheduler
 from sched import *
-from handlers import greeting, response
+from handlers import *
 from time import sleep
 import handlers
 import signal
