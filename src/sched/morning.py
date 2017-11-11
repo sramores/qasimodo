@@ -1,7 +1,7 @@
 from sched import scheduler
-from datetime import datetime
 
 
-@scheduler.scheduled_job('cron', day_of_week='mon-fri', second="*/5")
-def morning():
-    print("Holis! I am a task at {}".format(datetime.now()))
+@scheduler.scheduled_job('cron', day_of_week='mon-fri', hour=8)
+def morning(**kwargs):
+    client = kwargs['client']
+    client.rtm_send_message("qasimodo_pruebas", 'Buenos dias!')

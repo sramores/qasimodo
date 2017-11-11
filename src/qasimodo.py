@@ -1,6 +1,7 @@
 from threading import Thread
 from slackclient import SlackClient
 from sched import scheduler
+from sched import *
 from handlers import greeting, response
 import handlers
 import signal
@@ -9,49 +10,54 @@ import os
 
 
 class Qasimodo(object):
-    
     def __init__(self, token):
-        #self.event_handler = HandlerThread(token)
         self.scheduler = scheduler
+        self.__client = SlackClient(token)
+        if not self.__client.rtm_connect():
+            raise Exception("Cannot connect to Slack")
+
+        self.event_handler = HandlerThread(self.__client)
+        self.__init__scheduler()
         signal.signal(signal.SIGINT, self.__stop)
         signal.signal(signal.SIGTERM, self.__stop)
 
+    def __init__scheduler(self):
+        for job in self.scheduler.get_jobs():
+            job.modify(kwargs={'client': self.__client})
+
     def start(self):
         self.scheduler.start()
-        #self.event_handler.start()
-        #self.event_handler.join()
+        self.event_handler.start()
 
     def stop(self):
         self.event_handler.stop()
+        self.scheduler.shutdown()
 
     def __stop(self, *args, **kargs):
         self.stop()
 
-class HandlerThread(Thread):
 
-    def __init__(self, token):
+class HandlerThread(Thread):
+    def __init__(self, sc):
         Thread.__init__(self, daemon=True)
         self.__emitter = handlers.event_controller
         self.__continue = True
-        self.__token = token
+        self.__sc = sc
 
     def run(self):
         try:
-            sc = SlackClient(self.__token)
-            if sc.rtm_connect():
-                while self.__continue:
-                    events = sc.rtm_read()
-                    for e in events:
-                        print(e)
-                        if 'type' in e:
-                            self.__emitter.emit(e['type'], e, sc)
-            else:
-                raise Exception("cannot connect")
+            while self.__continue:
+                events = self.__sc.rtm_read()
+                for e in events:
+                    print(e)
+                    if 'type' in e:
+                        self.__emitter.emit(e['type'], e, self.__sc)
         except Exception as ex:
-            print("Exception: "+str(ex))
+            print("Exception: " + str(ex))
 
-    def stop(self):
-        self.__continue = False
+
+def stop(self):
+    self.__continue = False
 
 
 if __name__ == '__main__':
@@ -64,6 +70,3 @@ if __name__ == '__main__':
 
     qasimodo = Qasimodo(token)
     qasimodo.start()
-    #qasimodo.event_handler.join()
-    input()
-
