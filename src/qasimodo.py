@@ -3,6 +3,7 @@ from slackclient import SlackClient
 from sched import scheduler
 from sched import *
 from handlers import greeting, response
+from time import sleep
 import handlers
 import signal
 import sys
@@ -55,9 +56,8 @@ class HandlerThread(Thread):
         except Exception as ex:
             print("Exception: " + str(ex))
 
-
-def stop(self):
-    self.__continue = False
+    def stop(self):
+        self.__continue = False
 
 
 if __name__ == '__main__':
@@ -70,3 +70,6 @@ if __name__ == '__main__':
 
     qasimodo = Qasimodo(token)
     qasimodo.start()
+
+    while True:
+        sleep(3600)
