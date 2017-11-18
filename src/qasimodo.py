@@ -8,6 +8,7 @@ import handlers
 import signal
 import sys
 import os
+import logging
 
 
 class Qasimodo(object):
@@ -15,7 +16,9 @@ class Qasimodo(object):
         self.scheduler = scheduler
         self.__client = SlackClient(token)
         if not self.__client.rtm_connect():
-            raise Exception("Cannot connect to Slack")
+            msg = "Cannot connect to Slack"
+            logging.critical(msg)
+            raise Exception(msg)
 
         self.event_handler = HandlerThread(self.__client)
         self.__init__scheduler()
@@ -27,10 +30,12 @@ class Qasimodo(object):
             job.modify(kwargs={'client': self.__client})
 
     def start(self):
+        logging.info("Bot starting...")
         self.scheduler.start()
         self.event_handler.start()
 
     def stop(self):
+        logging.info("Bot stopping...")
         self.event_handler.stop()
         self.scheduler.shutdown()
 
@@ -46,30 +51,36 @@ class HandlerThread(Thread):
         self.__sc = sc
 
     def run(self):
-        try:
-            while self.__continue:
+        while self.__continue:
+            try:
                 events = self.__sc.rtm_read()
                 for e in events:
-                    print(e)
+                    logging.debug(e)
                     if 'type' in e:
                         self.__emitter.emit(e['type'], e, self.__sc)
-        except Exception as ex:
-            print("Exception: " + str(ex))
+            except Exception as ex:
+                logging.error("Exception: " + str(ex))
 
     def stop(self):
         self.__continue = False
+        logging.info('Handler stopped')
 
 
 if __name__ == '__main__':
+    logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=logging.DEBUG)
+
     if len(sys.argv) > 1:
         token = sys.argv[1]
     elif 'BOT_TOKEN' in os.environ:
         token = os.environ['BOT_TOKEN']
     else:
-        raise Exception('No token found for the bot')
+        msg = 'No token found for the bot'
+        logging.critical(msg)
+        raise Exception(msg)
 
     qasimodo = Qasimodo(token)
     qasimodo.start()
 
     while True:
         sleep(3600)
+    logging.warning("END")
