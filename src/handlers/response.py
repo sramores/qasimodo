@@ -1,5 +1,5 @@
 from . import event_controller as ec
-from .. import constants
+import constants
 
 
 @ec.on("message")
