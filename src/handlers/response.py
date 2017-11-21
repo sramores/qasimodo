@@ -1,8 +1,13 @@
 from . import event_controller as ec
+from .. import constants
 
 
 @ec.on("message")
 def response(event, client):
     if 'text' in event and 'qasimodo' in event['text']:
-        client.rtm_send_message(event['channel'], "k dise?")
+        msg = "k dise?"
+        if event['user'] == constants.vsolis:
+            msg = "k dise bisente?"
+
+        client.rtm_send_message(event['channel'], msg)
 
