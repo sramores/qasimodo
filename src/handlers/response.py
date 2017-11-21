@@ -5,7 +5,7 @@ import constants
 
 @ec.on("message")
 def response(event, client):
-    	if 'text' in event and 'qasimodo' in event['text']:
+    if 'text' in event and 'qasimodo' in event['text'].lower():
             msg = "k dise?"
         if event['user'] == constants.vsolis:
             msgBisente = ['Bisente pls, callate.', 'Sabes lo que eres. ¿No?', 'k dise Bisente']
@@ -15,8 +15,8 @@ def response(event, client):
         if event['user'] == constants.jrios:
             msg = "Loco, yo no soy de letras"
         if event['user'] ==constants.jariza:
-           msgCordobe = ['k dise cordobe.', 'Toca bacat del dìa', 'Mas sospechoso que un gitano haciendo footing']
-           msg =  msgCordobe[randint(0, len(msgCordobe)-1)]
+            msgCordobe = ['k dise cordobe.', 'Toca bacat del dìa', 'Mas sospechoso que un gitano haciendo footing']
+            msg =  msgCordobe[randint(0, len(msgCordobe)-1)]
         
         client.rtm_send_message(event['channel'], msg)
 			
