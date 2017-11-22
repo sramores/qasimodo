@@ -67,7 +67,17 @@ class HandlerThread(Thread):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=logging.DEBUG)
+    level = logging.INFO
+    if 'LOG_LEVEL' in os.environ:
+        if os.environ['LOG_LEVEL'] == 'DEBUG':
+            level = logging.DEBUG
+        elif os.environ['LOG_LEVEL'] == 'INFO':
+            level = logging.INFO
+        elif os.environ['LOG_LEVEL'] == 'WARNING':
+            level = logging.WARNING
+
+    logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=level)
+    logging.info("log level set to {}".format(level))
 
     if len(sys.argv) > 1:
         token = sys.argv[1]
