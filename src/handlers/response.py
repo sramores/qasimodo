@@ -17,6 +17,8 @@ def response(event, client):
         if event['user'] == constants.jariza:
             msgCordobe = ['k dise cordobe.', 'Toca bacat del dìa', 'Mas sospechoso que un gitano haciendo footing']
             msg =  msgCordobe[randint(0, len(msgCordobe)-1)]
+        if event['user'] == constants.bmartin:
+            msg = "Vicente, ¡despedido!"
         
         client.rtm_send_message(event['channel'], msg)
 
