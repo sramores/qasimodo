@@ -16,11 +16,14 @@ node() {
         }
 
         withCredentials([string(credentialsId: 'qasimodo-slack-token', variable: 'token')]) {
-            def runArgs = '\
+            withCredentials([string(credentialsId: 'witai-qasimodo-token', variable: 'wit_token')]) {
+                def runArgs = '\
 -e "BOT_TOKEN=$token" \
+-e "WITAI_QASIMODO_TOKEN=$wit_token" \
 --name qasimodo-bot'
 
-            def container = image.run(runArgs)
+                def container = image.run(runArgs)
+            }
         }
     }
 }
