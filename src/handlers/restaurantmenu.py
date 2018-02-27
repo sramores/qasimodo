@@ -10,8 +10,7 @@ import requests
 
 WIT_HEADERS = {
     'Accept': 'application/vnd.wit.20141022+json',
-    'Authorization': 'Bearer {}'.format("SFSUDFIUKCHUF4FPS4R6LVWLLWXJS5WQ")
-    #'Authorization': 'Bearer {}'.format(environ['WITAI_QASIMODO_TOKEN'])
+    'Authorization': 'Bearer {}'.format(environ['WITAI_QASIMODO_TOKEN'])
 }
 
 
@@ -20,7 +19,7 @@ def __is_asking_for_menu(msg):
     intents = rs['outcomes'][0]['entities']['intent']
     trait = list(filter(lambda x: x['value'] == 'restaurant_menu', intents))[0]
     log.info(trait)
-    return float(trait.get('confidence', 0)) > 0.7
+    return float(trait.get('confidence', 0)) > 0.6
 
 
 def __send_wit_request(msg):
