@@ -4,7 +4,7 @@ import logging as log
 import constants
 
 
-TOMATO_RATE = 0.65
+TOMATO_RATE = 0.35
 
 @ec.on("message")
 def response(event, client):
