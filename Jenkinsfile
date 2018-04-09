@@ -20,6 +20,7 @@ node() {
                 def runArgs = '\
 -e "BOT_TOKEN=$token" \
 -e "WITAI_QASIMODO_TOKEN=$wit_token" \
+-e "LOG_LEVEL=$LOG_LEVEL" \
 --name qasimodo-bot'
 
                 def container = image.run(runArgs)
