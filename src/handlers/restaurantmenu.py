@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from . import event_controller as ec
 from os import environ
 from urllib.request import Request, urlopen
@@ -13,6 +14,7 @@ WIT_HEADERS = {
     'Authorization': 'Bearer {}'.format(environ['WITAI_QASIMODO_TOKEN'])
 }
 
+MENU_WEB = "http://cafesbotiga.amadipesment.org/cafe-mirall/para-comer/"
 
 def __is_asking_for_menu(msg):
     rs = __send_wit_request(msg)
@@ -48,7 +50,7 @@ def __get_todays_menu(xml_menu):
 
 
 def __get_menu():
-    rq = Request("http://cafesbotiga.amadipesment.org/cafe-mirall/para-comer/", headers={'User-Agent': 'Some Browser'})
+    rq = Request(MENU_WEB, headers={'User-Agent': 'Some Browser'})
     with urlopen(rq) as f:
         data = f.read()
     doc = fromstring(data)
@@ -57,13 +59,22 @@ def __get_menu():
 
 
 @ec.on("message")
-def response(event, client):
+def build_response(event, client):
     qasimodo_cite = '<@{}>'.format(constants.qasimodo)
     if 'text' in event and (event['text'].startswith(qasimodo_cite) or event['text'].endswith(qasimodo_cite)):
         msg = event['text'].replace(qasimodo_cite, '')
         if __is_asking_for_menu(msg):
-            menu = __get_menu()
-            client.rtm_send_message(event['channel'], menu)
+            response = None
+            try:
+                response = __get_menu()
+            except Exception as ex:
+                log.error("Exception(restaurant_menu): " + str(ex))
+            finally:
+                if not (response and response.strip()):
+                    response = """No he podido encontrar datos para el menú de hoy.
+Puedes consultarlo directamente en {}""".format(MENU_WEB)
+
+            client.rtm_send_message(event['channel'], response)
 
 
 
