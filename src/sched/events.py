@@ -16,5 +16,5 @@ def feria(**kwargs):
     elif today < feria:
         msn = ("Sólo faltan " + str(days.days) + " días para la feria de Cordoba. :tada: :dancer:")
 
-        client = kwargs['client']
-        client.rtm_send_message(chn, msn)
+    client = kwargs['client']
+    client.rtm_send_message(chn, msn)
